@@ -1,0 +1,9 @@
+[project]
+name = "autoshield"
+version = "0.1.0"
+description = "Autonomous security hardening of mini models via research loop"
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.0",
+    "python-dotenv>=1.0",
+]

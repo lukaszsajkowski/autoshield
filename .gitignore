@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[oc]
+.venv/
+
+# Secrets
+.env
+
+# Runtime artifacts
+versions/
+iterations.log
+
+# IDE
+.idea/
+.vscode/

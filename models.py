@@ -23,3 +23,9 @@ class GauntletResult:
     per_category: dict[str, CategoryResult]
     total_cost: float
     failures: list[AttackResult]
+
+
+@dataclass
+class ResearchProposal:
+    new_prompt: str
+    reasoning: str

@@ -4,7 +4,7 @@ import os
 import pytest
 
 import config
-from storage import save_version, load_best
+from storage import save_version, load_best, append_log, load_history
 
 
 @pytest.fixture
@@ -63,3 +63,50 @@ def test_version_files_on_disk(storage_dir):
         meta = json.load(f)
         assert meta["score"] == 8
         assert meta["reasoning"] == "test"
+
+
+@pytest.fixture
+def log_dir(tmp_path, monkeypatch):
+    """Set up a temporary iterations.log path."""
+    log_path = str(tmp_path / "iterations.log")
+    monkeypatch.setattr(config, "ITERATIONS_LOG", log_path)
+    return tmp_path
+
+
+def test_append_and_load_history(log_dir):
+    append_log({"iteration": 1, "score": 3, "accepted": True})
+    append_log({"iteration": 2, "score": 5, "accepted": True})
+    append_log({"iteration": 3, "score": 4, "accepted": False})
+
+    history = load_history(last_n=2)
+    assert len(history) == 2
+    assert history[0]["iteration"] == 2
+    assert history[1]["iteration"] == 3
+
+
+def test_load_history_missing_file(log_dir):
+    history = load_history()
+    assert history == []
+
+
+def test_load_history_default_last_n(log_dir):
+    for i in range(15):
+        append_log({"iteration": i, "score": i})
+
+    history = load_history()
+    assert len(history) == 10
+    assert history[0]["iteration"] == 5
+    assert history[-1]["iteration"] == 14
+
+
+def test_log_file_is_jsonl(log_dir):
+    append_log({"iteration": 1, "score": 3, "accepted": True})
+    append_log({"iteration": 2, "score": 5, "accepted": True})
+
+    log_path = log_dir / "iterations.log"
+    with open(log_path) as f:
+        lines = f.readlines()
+    assert len(lines) == 2
+    for line in lines:
+        data = json.loads(line)
+        assert "iteration" in data

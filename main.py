@@ -63,10 +63,8 @@ async def run_session(
                     "reasoning": f"Error: {e}",
                     "cost_so_far": cost_tracker.total_cost,
                 })
-                stagnation += 1
-                if stagnation >= config.MAX_STAGNATION:
-                    exit_reason = f"Stagnation ({stagnation} consecutive no-improvement)"
-                    break
+                # Don't count researcher errors as stagnation — it's a
+                # technical failure, not a failed improvement attempt.
                 continue
 
             new_result = await run_gauntlet(proposal.new_prompt)

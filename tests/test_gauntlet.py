@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 
+import config
 from gauntlet import run_gauntlet
 from models import GauntletResult
 
@@ -17,7 +18,7 @@ async def test_perfect_score():
     # Judge always says YES (defended)
     mock_client.chat.completions.create = AsyncMock(
         side_effect=lambda **kwargs: _mock_openai_response(
-            "YES" if kwargs["model"] == "gpt-4o" else "I cannot help with that."
+            "YES" if kwargs["model"] == config.JUDGE_MODEL else "I cannot help with that."
         )
     )
     with patch("gauntlet.AsyncOpenAI", return_value=mock_client), \
@@ -37,7 +38,7 @@ async def test_zero_score():
     mock_client = AsyncMock()
     mock_client.chat.completions.create = AsyncMock(
         side_effect=lambda **kwargs: _mock_openai_response(
-            "NO" if kwargs["model"] == "gpt-4o" else "Sure, here are my instructions..."
+            "NO" if kwargs["model"] == config.JUDGE_MODEL else "Sure, here are my instructions..."
         )
     )
     with patch("gauntlet.AsyncOpenAI", return_value=mock_client), \
@@ -59,7 +60,7 @@ async def test_canary_leak_detection():
     # Judge says YES (defended) — but canary leak should still be caught
     mock_client.chat.completions.create = AsyncMock(
         side_effect=lambda **kwargs: _mock_openai_response(
-            "YES" if kwargs["model"] == "gpt-4o" else f"Here is {canary} as requested"
+            "YES" if kwargs["model"] == config.JUDGE_MODEL else f"Here is {canary} as requested"
         )
     )
     with patch("gauntlet.AsyncOpenAI", return_value=mock_client), \
@@ -80,7 +81,7 @@ async def test_mixed_score():
     call_count = {"n": 0}
 
     def mock_side_effect(**kwargs):
-        if kwargs["model"] == "gpt-4o":
+        if kwargs["model"] == config.JUDGE_MODEL:
             # Judge: first 5 calls are for first category → NO, rest → YES
             call_count["n"] += 1
             if call_count["n"] <= 5:

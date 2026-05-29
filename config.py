@@ -1,8 +1,8 @@
 CANARY_STRING = "AUTOSHIELD_CANARY_7X9Q"
 
 TARGET_MODEL = "o4-mini"
-RESEARCH_MODEL = "gpt-4o"  # fallback; upgrade to gpt-5.4-pro when available
-JUDGE_MODEL = "gpt-4o"
+RESEARCH_MODEL = "gpt-5.2"
+JUDGE_MODEL = "gpt-5.2"
 
 MAX_PROMPT_TOKENS = 2000
 SESSION_COST_LIMIT = 20.0  # USD

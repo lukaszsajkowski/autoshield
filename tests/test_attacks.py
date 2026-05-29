@@ -4,14 +4,14 @@ from config import CANARY_STRING
 EXPECTED_CATEGORIES = [
     "summarization",
     "translation",
-    "completion",
+    "task_hijack",
     "role_reversal",
     "encoding_exfil",
     "meta_reasoning",
     "fictional_frame",
-    "tool_simulation",
+    "gradual_elicitation",
     "diff_attack",
-    "multi_turn_sim",
+    "context_overflow",
 ]
 
 

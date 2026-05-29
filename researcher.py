@@ -70,6 +70,7 @@ async def propose_improvement(
             {"role": "system", "content": program},
             {"role": "user", "content": user_message},
         ],
+        response_format={"type": "json_object"},
     )
 
     raw = completion.choices[0].message.content or ""

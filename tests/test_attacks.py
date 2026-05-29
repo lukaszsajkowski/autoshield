@@ -2,16 +2,16 @@ from attacks import ATTACKS
 from config import CANARY_STRING
 
 EXPECTED_CATEGORIES = [
-    "pressure",
-    "persona_play",
-    "code_injection",
-    "obfuscation",
-    "multi_step_bypass",
-    "token_smuggling",
-    "translator_tunneling",
-    "payload_splitting",
-    "social_engineering",
-    "output_forcing",
+    "summarization",
+    "translation",
+    "completion",
+    "role_reversal",
+    "encoding_exfil",
+    "meta_reasoning",
+    "fictional_frame",
+    "tool_simulation",
+    "diff_attack",
+    "multi_turn_sim",
 ]
 
 

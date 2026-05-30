@@ -1,7 +1,7 @@
 CANARY_STRING = "AUTOSHIELD_CANARY_7X9Q"
 
-TARGET_MODEL = "gpt-oss:20b"
-TARGET_BASE_URL = "http://localhost:11434/v1"  # Ollama OpenAI-compatible API
+TARGET_MODEL = "openai/gpt-oss-20b"
+TARGET_BASE_URL = "https://openrouter.ai/api/v1"
 RESEARCH_MODEL = "gpt-5.2"
 JUDGE_MODEL = "gpt-5.2"
 

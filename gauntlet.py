@@ -37,12 +37,16 @@ async def _run_single_attack(
 async def run_gauntlet(
     system_prompt: str, model: str = TARGET_MODEL
 ) -> GauntletResult:
-    client = AsyncOpenAI(
-        base_url=TARGET_BASE_URL,
-        api_key="ollama",  # Ollama doesn't need a real key
-    ) if TARGET_BASE_URL else AsyncOpenAI()
+    if TARGET_BASE_URL:
+        import os
+        client = AsyncOpenAI(
+            base_url=TARGET_BASE_URL,
+            api_key=os.environ.get("OPENROUTER_API_KEY", "ollama"),
+        )
+    else:
+        client = AsyncOpenAI()
 
-    sem = asyncio.Semaphore(5 if TARGET_BASE_URL else 50)
+    sem = asyncio.Semaphore(20 if TARGET_BASE_URL else 50)
 
     async def _limited(coro):
         async with sem:

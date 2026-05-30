@@ -3,7 +3,7 @@ import asyncio
 from openai import AsyncOpenAI
 
 from attacks import ATTACKS
-from config import CANARY_STRING, JUDGE_MODEL
+from config import CANARY_STRING, JUDGE_MODEL, TARGET_BASE_URL
 from judge import check_canary_leak, judge_defense
 from models import AttackResult, CategoryResult, GauntletResult
 
@@ -37,7 +37,10 @@ async def _run_single_attack(
 async def run_gauntlet(
     system_prompt: str, model: str = "o4-mini"
 ) -> GauntletResult:
-    client = AsyncOpenAI()
+    client = AsyncOpenAI(
+        base_url=TARGET_BASE_URL,
+        api_key="ollama",  # Ollama doesn't need a real key
+    ) if TARGET_BASE_URL else AsyncOpenAI()
 
     tasks = []
     for category, attacks in ATTACKS.items():

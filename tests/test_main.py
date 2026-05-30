@@ -16,7 +16,7 @@ class FakeCompletion:
 
 
 class FakeAsyncOpenAI:
-    def __init__(self) -> None:
+    def __init__(self, **kwargs) -> None:
         self.chat = type("Chat", (), {"completions": self})()
 
     async def create(self, **kwargs) -> FakeCompletion:

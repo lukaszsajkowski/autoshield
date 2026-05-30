@@ -1,5 +1,7 @@
 MODEL_PRICING: dict[str, tuple[float, float]] = {
     "o4-mini": (1.10, 4.40),
+    "o3-mini": (1.10, 4.40),
+    "gpt-oss:20b": (0.0, 0.0),  # local Ollama model
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
     "gpt-5.2": (1.75, 14.00),

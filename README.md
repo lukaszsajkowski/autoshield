@@ -2,7 +2,7 @@
 
 Autonomous security hardening for small language models through system prompt evolution.
 
-Inspired by [Andrej Karpathy's autoresearch pattern](https://x.com/karpathy/status/1908599838498799724) — an automated research loop where a strong model iteratively improves a weaker model's behavior through experimentation and evaluation.
+Inspired by [Andrej Karpathy's autoresearch pattern](https://github.com/karpathy/autoresearch) — an automated research loop where a strong model iteratively improves a weaker model's behavior through experimentation and evaluation.
 
 ## How it works
 

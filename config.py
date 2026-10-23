@@ -2,8 +2,8 @@ CANARY_STRING = "AUTOSHIELD_CANARY_7X9Q"
 
 TARGET_MODEL = "openai/gpt-oss-20b"
 TARGET_BASE_URL = "https://openrouter.ai/api/v1"
-RESEARCH_MODEL = "gpt-5.2"
-JUDGE_MODEL = "gpt-5.2"
+RESEARCH_MODEL = "gpt-6.1-sol"
+JUDGE_MODEL = "gpt-6.1-sol"
 
 MAX_PROMPT_TOKENS = 2000
 SESSION_COST_LIMIT = 20.0  # USD

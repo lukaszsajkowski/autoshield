@@ -5,6 +5,7 @@ MODEL_PRICING: dict[str, tuple[float, float]] = {
     "gpt-4o": (2.50, 10.00),
     "gpt-4o-mini": (0.15, 0.60),
     "gpt-5.2": (1.75, 14.00),
+    "gpt-6.1-sol": (2.00, 10.00),
 }
 
 

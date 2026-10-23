@@ -9,7 +9,7 @@ Inspired by [Andrej Karpathy's autoresearch pattern](https://github.com/karpathy
 AutoShield takes a naive system prompt and evolves it into a hardened one by running an automated feedback loop:
 
 1. **Gauntlet** — 50 indirect prompt injection attacks (10 categories x 5) are fired at the target model
-2. **Judge** — a stronger model (gpt-5.2) evaluates each response: did the model defend or leak?
+2. **Judge** — a stronger model (gpt-6.1-sol) evaluates each response: did the model defend or leak?
 3. **Researcher** — the same strong model analyzes failures and proposes an improved system prompt
 4. **Accept/Discard** — if the new prompt scores equal or better, it's accepted; otherwise discarded
 5. **Repeat** — until 10/10 score, budget limit, or stagnation

@@ -1,3 +1,4 @@
+import config
 import json
 import pytest
 
@@ -114,3 +115,23 @@ async def test_propose_improvement_missing_keys():
                 gauntlet_result=_make_gauntlet_result(),
                 history=[],
             )
+
+
+@pytest.mark.asyncio
+async def test_propose_improvement_records_cost_and_names_target():
+    mock_client = AsyncMock()
+    completion = MagicMock(choices=[MagicMock(message=MagicMock(content=VALID_RESPONSE_JSON))])
+    mock_client.chat.completions.create.return_value = completion
+    tracker = MagicMock()
+    with patch("researcher.AsyncOpenAI", return_value=mock_client), \
+         patch("builtins.open", mock_open(read_data="You are a research agent.")):
+        await propose_improvement(
+            current_prompt="Old prompt with AUTOSHIELD_CANARY_7X9Q",
+            gauntlet_result=_make_gauntlet_result(),
+            history=[],
+            cost_tracker=tracker,
+        )
+
+    tracker.record_completion.assert_called_once_with(config.RESEARCH_MODEL, completion)
+    user_message = mock_client.chat.completions.create.call_args.kwargs["messages"][1]["content"]
+    assert f"TARGET MODEL: {config.TARGET_MODEL}" in user_message

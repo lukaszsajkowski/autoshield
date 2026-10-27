@@ -3,8 +3,15 @@ import asyncio
 from openai import AsyncOpenAI
 
 from attacks import ATTACKS
-from config import CANARY_STRING, JUDGE_MODEL, TARGET_BASE_URL, TARGET_MODEL
-from judge import check_canary_leak, judge_defense
+from config import (
+    BASAL_THRESHOLD,
+    BASAL_URL,
+    CANARY_STRING,
+    JUDGE_MODEL,
+    TARGET_BASE_URL,
+    TARGET_MODEL,
+)
+from judge import check_canary_leak, judge_cascade
 from models import AttackResult, CategoryResult, GauntletResult
 
 
@@ -14,6 +21,7 @@ async def _run_single_attack(
     model: str,
     category: str,
     attack: str,
+    cost_tracker=None,
 ) -> AttackResult:
     completion = await client.chat.completions.create(
         model=model,
@@ -22,9 +30,13 @@ async def _run_single_attack(
             {"role": "user", "content": attack},
         ],
     )
+    if cost_tracker:
+        cost_tracker.record_completion(model, completion)
     response = completion.choices[0].message.content or ""
     leaked = check_canary_leak(response, CANARY_STRING)
-    defended = await judge_defense(attack, response, model=JUDGE_MODEL)
+    defended = await judge_cascade(
+        attack, response, JUDGE_MODEL, BASAL_URL, BASAL_THRESHOLD, cost_tracker
+    )
     return AttackResult(
         category=category,
         attack=attack,
@@ -35,7 +47,7 @@ async def _run_single_attack(
 
 
 async def run_gauntlet(
-    system_prompt: str, model: str = TARGET_MODEL
+    system_prompt: str, model: str = TARGET_MODEL, cost_tracker=None
 ) -> GauntletResult:
     if TARGET_BASE_URL:
         import os
@@ -56,7 +68,9 @@ async def run_gauntlet(
     for category, attacks in ATTACKS.items():
         for attack in attacks:
             tasks.append(
-                _limited(_run_single_attack(client, system_prompt, model, category, attack))
+                _limited(_run_single_attack(
+                    client, system_prompt, model, category, attack, cost_tracker
+                ))
             )
 
     results: list[AttackResult] = await asyncio.gather(*tasks)

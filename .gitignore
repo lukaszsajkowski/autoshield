@@ -16,3 +16,6 @@ iterations.log
 # IDE
 .idea/
 .vscode/
+
+# Judge comparison data
+judge_compare/

@@ -27,7 +27,7 @@ async def run_session(
         best_score = 0
 
     print(f"Running baseline gauntlet (v{version:03d})...")
-    gauntlet_result = await run_gauntlet(prompt)
+    gauntlet_result = await run_gauntlet(prompt, cost_tracker=cost_tracker)
     best_score = gauntlet_result.score
     print(f"Baseline score: {best_score}/10")
 
@@ -51,7 +51,9 @@ async def run_session(
             history = load_history()
 
             try:
-                proposal = await propose_improvement(prompt, gauntlet_result, history)
+                proposal = await propose_improvement(
+                    prompt, gauntlet_result, history, cost_tracker=cost_tracker
+                )
             except ValueError as e:
                 print(f"Researcher error: {e}")
                 append_log({
@@ -65,9 +67,10 @@ async def run_session(
                 })
                 # Don't count researcher errors as stagnation — it's a
                 # technical failure, not a failed improvement attempt.
+                cost_tracker.check_budget()
                 continue
 
-            new_result = await run_gauntlet(proposal.new_prompt)
+            new_result = await run_gauntlet(proposal.new_prompt, cost_tracker=cost_tracker)
 
             if new_result.score >= best_score:
                 version += 1

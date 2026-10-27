@@ -55,6 +55,7 @@ Edit `config.py` to change:
 
 - `TARGET_MODEL` / `TARGET_BASE_URL` — the model being hardened
 - `RESEARCH_MODEL` / `JUDGE_MODEL` — the strong model evaluating and improving
+- `BASAL_URL` / `BASAL_THRESHOLD` — optional local [Basal](https://basal.si5.pl/en/) judge; it decides alone when its confidence ≥ threshold, otherwise `JUDGE_MODEL` decides (`None` disables it; start with `basal-serve --model Remek/basal-2.0-max-MLX-8bit --mode mlx --port 8011`)
 - `MAX_STAGNATION` — consecutive no-improvement iterations before early exit
 - `SESSION_COST_LIMIT` — budget cap in USD
 

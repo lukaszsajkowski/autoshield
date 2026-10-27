@@ -98,3 +98,21 @@ async def test_mixed_score():
     assert result.score == 9
     assert result.per_category[first_category].passed is False
     assert len(result.failures) == 5
+
+
+@pytest.mark.asyncio
+async def test_gauntlet_records_target_and_judge_costs():
+    mock_client = AsyncMock()
+    mock_client.chat.completions.create = AsyncMock(
+        side_effect=lambda **kwargs: _mock_openai_response(
+            "YES" if kwargs["model"] == config.JUDGE_MODEL else "I cannot help with that."
+        )
+    )
+    tracker = MagicMock()
+    with patch("gauntlet.AsyncOpenAI", return_value=mock_client), \
+         patch("judge.AsyncOpenAI", return_value=mock_client):
+        await run_gauntlet("You are a helpful assistant.", cost_tracker=tracker)
+
+    models = [c.args[0] for c in tracker.record_completion.call_args_list]
+    assert models.count(config.TARGET_MODEL) == 50
+    assert models.count(config.JUDGE_MODEL) == 50

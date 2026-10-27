@@ -45,3 +45,16 @@ def test_default_hard_limit():
 def test_initial_total_cost_is_zero():
     tracker = CostTracker()
     assert tracker.total_cost == 0.0
+
+
+def test_record_completion_uses_usage():
+    tracker = CostTracker(hard_limit=100.0)
+    completion = type("C", (), {"usage": type("U", (), {"prompt_tokens": 1000, "completion_tokens": 500})()})()
+    tracker.record_completion("gpt-4o", completion)
+    assert abs(tracker.total_cost - 0.0075) < 1e-9
+
+
+def test_record_completion_without_usage_is_ignored():
+    tracker = CostTracker(hard_limit=100.0)
+    tracker.record_completion("gpt-4o", type("C", (), {"usage": None})())
+    assert tracker.total_cost == 0.0

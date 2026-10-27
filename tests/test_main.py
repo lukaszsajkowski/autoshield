@@ -58,3 +58,11 @@ async def test_baseline_only(session_dir, capsys):
 
     # No iterations.log should exist (no research loop ran)
     assert not (session_dir / "iterations.log").exists()
+
+
+@pytest.mark.asyncio
+async def test_session_tracks_cost(session_dir, capsys):
+    await run_session(baseline_only=True)
+    out = capsys.readouterr().out
+    assert "Total cost: $" in out
+    assert "Total cost: $0.00\n" not in out

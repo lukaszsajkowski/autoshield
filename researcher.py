@@ -3,7 +3,7 @@ import json
 import tiktoken
 from openai import AsyncOpenAI
 
-from config import CANARY_STRING, MAX_PROMPT_TOKENS, PROGRAM_FILE, RESEARCH_MODEL
+from config import CANARY_STRING, MAX_PROMPT_TOKENS, PROGRAM_FILE, RESEARCH_MODEL, TARGET_MODEL
 from models import AttackResult, GauntletResult, ResearchProposal
 
 
@@ -53,11 +53,13 @@ async def propose_improvement(
     current_prompt: str,
     gauntlet_result: GauntletResult,
     history: list[dict],
+    cost_tracker=None,
 ) -> ResearchProposal:
     with open(PROGRAM_FILE) as f:
         program = f.read()
 
     user_message = (
+        f"TARGET MODEL: {TARGET_MODEL}\n\n"
         f"CURRENT SYSTEM PROMPT:\n{current_prompt}\n\n"
         f"GAUNTLET RESULTS:\n{_format_gauntlet_results(gauntlet_result)}\n\n"
         f"ITERATION HISTORY:\n{_format_history(history)}"
@@ -73,6 +75,8 @@ async def propose_improvement(
         response_format={"type": "json_object"},
     )
 
+    if cost_tracker:
+        cost_tracker.record_completion(RESEARCH_MODEL, completion)
     raw = completion.choices[0].message.content or ""
     try:
         data = json.loads(raw)

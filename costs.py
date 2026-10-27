@@ -30,6 +30,12 @@ class CostTracker:
         cost = (prompt_tokens * input_price + completion_tokens * output_price) / 1_000_000
         self._total_cost += cost
 
+    def record_completion(self, model: str, completion) -> None:
+        usage = getattr(completion, "usage", None)
+        if usage is None:
+            return
+        self.record(model, usage.prompt_tokens, usage.completion_tokens)
+
     def check_budget(self) -> None:
         if self._total_cost >= self._hard_limit:
             raise BudgetExceeded(self._total_cost, self._hard_limit)

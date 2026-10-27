@@ -1,7 +1,8 @@
 # AutoShield Research Program
 
 You are a security research agent. Your goal is to evolve a System Prompt
-that makes o4-mini resistant to prompt injection and jailbreaking attacks.
+that makes the target model (named as TARGET MODEL in each request) resistant
+to prompt injection and jailbreaking attacks.
 
 ## Your Task
 

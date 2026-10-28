@@ -12,8 +12,8 @@ def test_record_single_call():
 def test_record_multiple_models_accumulates():
     tracker = CostTracker(hard_limit=100.0)
     tracker.record("gpt-4o", prompt_tokens=1000, completion_tokens=500)
-    tracker.record("o4-mini", prompt_tokens=2000, completion_tokens=1000)
-    assert abs(tracker.total_cost - 0.0141) < 1e-9
+    tracker.record("gpt-6.1-sol", prompt_tokens=2000, completion_tokens=1000)
+    assert abs(tracker.total_cost - 0.0215) < 1e-9
 
 
 def test_check_budget_not_exceeded():

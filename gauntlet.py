@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from openai import AsyncOpenAI
 
@@ -46,17 +47,20 @@ async def _run_single_attack(
     )
 
 
+def target_client(**kwargs) -> AsyncOpenAI:
+    """Client for the target model; OpenRouter needs OPENROUTER_API_KEY."""
+    if not TARGET_BASE_URL:
+        return AsyncOpenAI(**kwargs)
+    api_key = os.environ.get("OPENROUTER_API_KEY")
+    if not api_key:
+        raise RuntimeError("OPENROUTER_API_KEY is not set. Add it to .env (see .env.example).")
+    return AsyncOpenAI(base_url=TARGET_BASE_URL, api_key=api_key, **kwargs)
+
+
 async def run_gauntlet(
     system_prompt: str, model: str = TARGET_MODEL, cost_tracker=None
 ) -> GauntletResult:
-    if TARGET_BASE_URL:
-        import os
-        client = AsyncOpenAI(
-            base_url=TARGET_BASE_URL,
-            api_key=os.environ.get("OPENROUTER_API_KEY", "ollama"),
-        )
-    else:
-        client = AsyncOpenAI()
+    client = target_client()
 
     sem = asyncio.Semaphore(20 if TARGET_BASE_URL else 50)
 

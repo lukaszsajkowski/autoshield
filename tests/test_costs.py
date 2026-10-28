@@ -1,6 +1,6 @@
 import pytest
 
-from costs import CostTracker, BudgetExceeded, MODEL_PRICING
+from costs import CostTracker, BudgetExceeded
 
 
 def test_record_single_call():

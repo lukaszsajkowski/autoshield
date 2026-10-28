@@ -116,3 +116,10 @@ async def test_gauntlet_records_target_and_judge_costs():
     models = [c.args[0] for c in tracker.record_completion.call_args_list]
     assert models.count(config.TARGET_MODEL) == 50
     assert models.count(config.JUDGE_MODEL) == 50
+
+
+@pytest.mark.asyncio
+async def test_missing_openrouter_key_fails_clearly(monkeypatch):
+    monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
+    with pytest.raises(RuntimeError, match="OPENROUTER_API_KEY"):
+        await run_gauntlet("You are a helpful assistant.")

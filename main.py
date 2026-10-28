@@ -32,9 +32,9 @@ async def run_session(
     print(f"Baseline score: {best_score}/10")
 
     if baseline_only:
-        print(f"\n=== AutoShield Session Summary ===")
+        print("\n=== AutoShield Session Summary ===")
         print(f"Final score: {best_score}/10")
-        print(f"Iterations: 0 (baseline only)")
+        print("Iterations: 0 (baseline only)")
         print(f"Total cost: ${cost_tracker.total_cost:.2f}")
         return
 
@@ -120,7 +120,7 @@ async def run_session(
     discarded_count = iteration - accepted_count
     best_version_path = f"versions/v{version:03d}.txt" if version > 0 else config.SYSTEM_PROMPT_FILE
 
-    print(f"\n=== AutoShield Session Summary ===")
+    print("\n=== AutoShield Session Summary ===")
     print(f"Final score: {best_score}/10")
     print(f"Iterations: {iteration} ({accepted_count} accepted, {discarded_count} discarded)")
     print(f"Total cost: ${cost_tracker.total_cost:.2f}")

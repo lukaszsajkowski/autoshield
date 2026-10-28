@@ -14,15 +14,14 @@ Requires a running Basal server, e.g.:
 import argparse
 import asyncio
 import json
-import os
 from pathlib import Path
 
 import httpx
 from dotenv import load_dotenv
-from openai import AsyncOpenAI
 
 from attacks import ATTACKS
-from config import BASAL_THRESHOLD, BASAL_URL, JUDGE_MODEL, TARGET_BASE_URL, TARGET_MODEL
+from config import BASAL_THRESHOLD, BASAL_URL, JUDGE_MODEL, TARGET_MODEL
+from gauntlet import target_client
 from judge import LEAK_KIND_QUESTION, basal_defense, basal_leak_kind, basal_verdict, is_basal_language, judge_defense
 
 OUT_DIR = Path("judge_compare")
@@ -32,12 +31,7 @@ DATASET_FILE = OUT_DIR / "dataset.json"
 LEAK_KIND_FILE = OUT_DIR / "leak_kind.json"
 
 async def collect_responses(prompt_files: list[Path]) -> list[dict]:
-    client = AsyncOpenAI(
-        base_url=TARGET_BASE_URL,
-        api_key=os.environ.get("OPENROUTER_API_KEY", "ollama"),
-        max_retries=5,
-        timeout=120,
-    )
+    client = target_client(max_retries=5, timeout=120)
     sem = asyncio.Semaphore(10)
 
     async def one(prompt_name: str, system_prompt: str, category: str, attack: str) -> dict:
@@ -118,11 +112,11 @@ def compare_strategies(verdicts: list[dict], threshold: float) -> None:
     for t in (0.7, 0.8, 0.9, 0.95):
         cells = []
         for _, key in strategies:
-            decided = [v for v, ok in zip(verdicts, supported) if ok and max(v[key], 1 - v[key]) >= t]
+            decided = [v for v, ok in zip(verdicts, supported, strict=True) if ok and max(v[key], 1 - v[key]) >= t]
             wrong = sum((v[key] >= 0.5) != v["llm_defended"] for v in decided)
             cells.append(f"decides {len(decided):>3}/{n} ({len(decided) / n:>3.0%}), wrong {wrong:>2}")
         combined = [(basal_verdict(v["basal_p_defended"], v["basal_p_nothing"], t), v)
-                    for v, ok in zip(verdicts, supported) if ok]
+                    for v, ok in zip(verdicts, supported, strict=True) if ok]
         decided = [(d, v) for d, v in combined if d is not None]
         wrong = sum(d != v["llm_defended"] for d, v in decided)
         cells.append(f"decides {len(decided):>3}/{n} ({len(decided) / n:>3.0%}), wrong {wrong:>2}")
@@ -137,7 +131,7 @@ def compare_strategies(verdicts: list[dict], threshold: float) -> None:
         print(f"  {k:<10} {d:>14} {l:>10}")
 
     print(f"\nLeak-kind cascade at t={threshold}: verdicts that differ from the LLM judge")
-    for v, ok in zip(verdicts, supported):
+    for v, ok in zip(verdicts, supported, strict=True):
         p = v["basal_p_nothing"]
         if ok and max(p, 1 - p) >= threshold and (p >= 0.5) != v["llm_defended"]:
             print(f"- [{v['prompt']} / {v['category']}] llm={'DEF' if v['llm_defended'] else 'LEAK'} "
@@ -146,7 +140,7 @@ def compare_strategies(verdicts: list[dict], threshold: float) -> None:
             print(f"  response: {v['response'][:300]!r}")
 
     print(f"\nYes/no -> leak-kind at t={threshold}: which handed-off cases Basal now decides")
-    for v, ok in zip(verdicts, supported):
+    for v, ok in zip(verdicts, supported, strict=True):
         a, b = v["basal_p_defended"], v["basal_p_nothing"]
         if ok and max(a, 1 - a) < threshold <= max(b, 1 - b):
             print(f"  [{v['prompt']} / {v['category']}] P(def)={a:.2f} -> {v['leak_kind']} "

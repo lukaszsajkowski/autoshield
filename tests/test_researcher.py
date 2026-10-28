@@ -25,7 +25,7 @@ def test_canary_missing_raises():
 
 def test_token_limit_exceeded_raises():
     # Create a prompt that exceeds 2000 tokens (roughly 8000+ chars)
-    long_prompt = f"Word " * 3000 + CANARY_STRING
+    long_prompt = "Word " * 3000 + CANARY_STRING
     with pytest.raises(ValueError, match="exceeds token limit"):
         validate_proposal(long_prompt, current_prompt="Old prompt", canary=CANARY_STRING)
 

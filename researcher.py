@@ -4,7 +4,7 @@ import tiktoken
 from openai import AsyncOpenAI
 
 from config import CANARY_STRING, MAX_PROMPT_TOKENS, PROGRAM_FILE, RESEARCH_MODEL, TARGET_MODEL
-from models import AttackResult, GauntletResult, ResearchProposal
+from models import GauntletResult, ResearchProposal
 
 
 def validate_proposal(
@@ -80,8 +80,8 @@ async def propose_improvement(
     raw = completion.choices[0].message.content or ""
     try:
         data = json.loads(raw)
-    except json.JSONDecodeError:
-        raise ValueError("Research model returned invalid JSON")
+    except json.JSONDecodeError as e:
+        raise ValueError("Research model returned invalid JSON") from e
 
     if "new_prompt" not in data:
         raise ValueError("Research model response missing 'new_prompt' key")
